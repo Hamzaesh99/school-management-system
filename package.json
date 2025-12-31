@@ -6,9 +6,16 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "init-db": "node database/init-db.js"
+    "init-db": "node database/init-db.js",
+    "generate-config": "node scripts/generate-config.js",
+    "build": "node scripts/generate-config.js && echo 'Frontend ready'"
   },
-  "keywords": ["school", "management", "education", "system"],
+  "keywords": [
+    "school",
+    "management",
+    "education",
+    "system"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {

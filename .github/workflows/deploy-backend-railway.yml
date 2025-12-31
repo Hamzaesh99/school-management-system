@@ -1,0 +1,52 @@
+name: Deploy Backend to Railway
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - 'server.js'
+      - 'package.json'
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Railway CLI
+        run: |
+          npm install -g railway
+
+      - name: Login to Railway
+        env:
+          RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+        run: |
+          echo "$RAILWAY_API_KEY" | railway login --apiKey
+
+      - name: Link to Railway project (if needed)
+        env:
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          # If your repository isn't already linked to a Railway project, you can link it here.
+          # This command is safe to run if already linked.
+          railway link $RAILWAY_PROJECT_ID || true
+
+      - name: Deploy service to Railway
+        run: |
+          # Deploy current repo to Railway. Adjust command if your service name or workflow differs.
+          railway up --detach || railway deploy || echo "Railway deploy command may differ; check Railway CLI docs"
+
+      - name: Post-deploy note
+        run: |
+          echo "Deployment job finished. Check Railway project dashboard for build logs and service URL."
+
+# Required repository secrets:
+# - RAILWAY_API_KEY : your Railway API key
+# - RAILWAY_PROJECT_ID : the Railway project ID (optional if repo is pre-linked via Railway UI)

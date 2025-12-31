@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+// `API_URL` مُعرف في `common.js`، تأكد من تحميله أولاً في صفحات HTML
 
 function getToken() {
     return localStorage.getItem('token');

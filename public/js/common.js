@@ -1,4 +1,18 @@
-const API_URL = 'http://localhost:3000/api';
+let API_URL = 'https://school-backend.up.railway.app/api';
+
+// Attempt to load runtime config generated during build (`public/config.json`).
+// This allows injecting the production `API_URL` without editing source files.
+fetch('/config.json').then(res => {
+    if (!res.ok) throw new Error('no config');
+    return res.json();
+}).then(cfg => {
+    if (cfg && cfg.API_URL) {
+        API_URL = cfg.API_URL;
+        console.info('API_URL set from config.json:', API_URL);
+    }
+}).catch(() => {
+    // ignore — fallback to the hardcoded value
+});
 
 function checkAuth() {
     const token = localStorage.getItem('token');

@@ -1,5 +1,4 @@
-// API Base URL
-const API_URL = 'http://localhost:3000/api';
+// `API_URL` الآن يُعرّف في `common.js`، تأكد من تحميل `common.js` قبل هذا الملف في صفحات HTML
 
 // Global Toast Notification System
 function showToast(message, type = 'success') {

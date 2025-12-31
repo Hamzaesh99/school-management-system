@@ -1,0 +1,42 @@
+name: Build and Deploy Frontend (Netlify)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate config.json
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: npm run generate-config
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.2.3
+        with:
+          publish-dir: public
+          production-branch: main
+          netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: Note about Railway
+        run: |
+          echo "To deploy backend to Railway, enable Railway's GitHub integration or use Railway CLI/action."
+          echo "See NETLIFY_RAILWAY_DEPLOYMENT.md for instructions and placeholders."
+
+# Required secrets for this workflow:
+# - API_URL: the backend API URL to embed into public/config.json (e.g. https://your-railway.up.railway.app/api)
+# - NETLIFY_AUTH_TOKEN: Netlify personal access token
+# - NETLIFY_SITE_ID: Netlify site ID for your site
