@@ -21,31 +21,24 @@ jobs:
           node-version: '18'
 
       - name: Install Railway CLI
-        run: |
-          npm install -g railway
+        run: npm install -g railway
 
       - name: Login to Railway
         env:
           RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
-        run: |
-          echo "$RAILWAY_API_KEY" | railway login --apiKey
+        run: echo "$RAILWAY_API_KEY" | railway login --apiKey
 
       - name: Link to Railway project (if needed)
         env:
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-        run: |
-          # If your repository isn't already linked to a Railway project, you can link it here.
-          # This command is safe to run if already linked.
-          railway link $RAILWAY_PROJECT_ID || true
+        run: railway link $RAILWAY_PROJECT_ID || true
 
       - name: Deploy service to Railway
         run: |
-          # Deploy current repo to Railway. Adjust command if your service name or workflow differs.
           railway up --detach || railway deploy || echo "Railway deploy command may differ; check Railway CLI docs"
 
       - name: Post-deploy note
-        run: |
-          echo "Deployment job finished. Check Railway project dashboard for build logs and service URL."
+        run: echo "Deployment job finished. Check Railway project dashboard for build logs and service URL."
 
 # Required repository secrets:
 # - RAILWAY_API_KEY : your Railway API key
