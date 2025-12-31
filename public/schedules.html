@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الجداول الدراسية - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .schedule-grid {
+            overflow-x: auto;
+        }
+
+        .schedule-table {
+            min-width: 900px;
+        }
+
+        .schedule-table th {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            font-weight: 700;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .schedule-table td {
+            min-width: 120px;
+            vertical-align: top;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .schedule-table td:first-child {
+            background: #f9fafb;
+            font-weight: 600;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .schedule-cell {
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            min-height: 80px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .schedule-cell:hover {
+            background: #f3f4f6;
+            transform: translateY(-1px);
+        }
+
+        .schedule-cell.empty-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #d1d5db;
+            background: #fafafa;
+        }
+
+        .schedule-cell.empty-cell:hover {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .add-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .add-text {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .schedule-cell.empty-cell:hover .add-text {
+            color: #10b981;
+        }
+
+        .schedule-cell.has-class {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+            color: #065f46;
+            padding: 0.5rem;
+        }
+
+        .schedule-cell.has-class:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.25);
+            border-color: #059669;
+        }
+
+        .subject-name {
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            font-size: 0.95rem;
+            color: #065f46;
+        }
+
+        .teacher-name {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .room-name {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        .schedule-actions {
+            display: none;
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            gap: 0.25rem;
+        }
+
+        .schedule-cell.has-class:hover .schedule-actions {
+            display: flex;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.4rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.edit {
+            color: #0891b2;
+        }
+
+        .action-btn.edit:hover {
+            background: #0891b2;
+            color: white;
+        }
+
+        .action-btn.delete {
+            color: #dc2626;
+        }
+
+        .action-btn.delete:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 550px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .modal-header h2 {
+            margin: 0 !important;
+            color: #1e3a8a;
+            font-size: 1.5rem;
+        }
+
+        .close-modal {
+            background: #fee2e2;
+            color: #dc2626;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: #dc2626;
+            color: white;
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"><span id="userInitials">SM</span></div>
+                <div class="user-details">
+                    <h4 id="userName">مدير النظام</h4>
+                    <p id="userRole">إداري</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">لوحة
+                        التحكم</span></a>
+                <a href="/students" class="nav-item admin-only student-only"><span class="nav-icon">👨‍🎓</span><span
+                        class="nav-text">إدارة
+                        الطلاب</span></a>
+                <a href="/teachers" class="nav-item admin-only"><span class="nav-icon">👨‍🏫</span><span
+                        class="nav-text">إدارة
+                        المعلمين</span></a>
+                <a href="/parents" class="nav-item admin-only student-only"><span class="nav-icon">👥</span><span
+                        class="nav-text">أولياء
+                        الأمور</span></a>
+                <a href="/classes" class="nav-item admin-only teacher-only"><span class="nav-icon">🏫</span><span
+                        class="nav-text">الصفوف
+                        والمواد</span></a>
+                <a href="/schedules" class="nav-item active student-only parent-only teacher-only"><span
+                        class="nav-icon">📅</span><span class="nav-text">الجداول الدراسية</span></a>
+                <a href="/attendance" class="nav-item teacher-only student-only parent-only"><span
+                        class="nav-icon">✅</span><span class="nav-text">الحضور
+                        والغياب</span></a>
+                <a href="/grades" class="nav-item student-only parent-only teacher-only"><span
+                        class="nav-icon">📝</span><span class="nav-text">الدرجات</span></a>
+                <a href="/users-management" class="nav-item admin-only"><span class="nav-icon">👤</span><span
+                        class="nav-text">إدارة المستخدمين</span></a>
+                <a href="/profile.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="page-title">الجداول الدراسية</h1>
+                <button class="btn btn-primary" id="createScheduleBtn">+ إنشاء جدول</button>
+            </header>
+
+            <div class="card">
+                <div class="d-flex justify-between align-center mb-3">
+                    <h3>الجدول الأسبوعي</h3>
+                    <div class="d-flex" style="gap: 1rem;">
+                        <select id="classSelect" class="form-control" style="width: auto;">
+                            <option value="">اختر الصف الدراسي...</option>
+                        </select>
+                        <input type="text" id="yearSelect" class="form-control" list="yearOptions" style="width: 200px;"
+                            placeholder="العام الدراسي" value="2024-2025">
+                        <datalist id="yearOptions">
+                            <option value="2024-2025">
+                            <option value="2025-2026">
+                            <option value="2026-2027">
+                        </datalist>
+                        <select id="semesterSelect" class="form-control" style="width: auto;">
+                            <option value="first">الفصل الأول</option>
+                            <option value="second">الفصل الثاني</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                    <table class="table schedule-table">
+                        <thead>
+                            <tr>
+                                <th>الوقت</th>
+                                <th>الأحد</th>
+                                <th>الإثنين</th>
+                                <th>الثلاثاء</th>
+                                <th>الأربعاء</th>
+                                <th>الخميس</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 3rem;">
+                                    <p style="font-size: 1.1rem; color: var(--gray-600);">
+                                        📅 اختر صفاً دراسياً لعرض جدوله
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3" style="text-align: center; color: var(--gray-600);">
+                    <p>💡 <strong>نصيحة:</strong> للحصول على أفضل تجربة، قم أولاً بتخصيص المعلمين والمواد للصفوف من <a
+                            href="/teachers" style="color: var(--calm-blue);">صفحة المعلمين</a>.</p>
+                    <p style="font-size: 0.9rem;">يمكنك أيضاً إنشاء الجدول مباشرة، وسيتم إنشاء التخصيصات تلقائياً.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="scheduleModalTitle">إضافة حصة دراسية</h2>
+                <button class="close-modal" id="closeScheduleModal">&times;</button>
+            </div>
+            <form id="scheduleForm">
+                <input type="hidden" id="scheduleId">
+                <div class="form-group">
+                    <label class="form-label">الصف الدراسي</label>
+                    <select id="scheduleClass" class="form-control" required>
+                        <option value="">اختر الصف...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">المادة</label>
+                    <select id="scheduleSubject" class="form-control" required>
+                        <option value="">اختر المادة...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">المعلم</label>
+                    <select id="scheduleTeacher" class="form-control">
+                        <option value="">-- اختر المعلم --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">اليوم</label>
+                    <select id="scheduleDay" class="form-control" required>
+                        <option value="Sunday">الأحد</option>
+                        <option value="Monday">الإثنين</option>
+                        <option value="Tuesday">الثلاثاء</option>
+                        <option value="Wednesday">الأربعاء</option>
+                        <option value="Thursday">الخميس</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">وقت البداية</label>
+                    <input type="time" id="startTime" class="form-control" required value="08:00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">وقت النهاية</label>
+                    <input type="time" id="endTime" class="form-control" required value="09:00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رقم القاعة (اختياري)</label>
+                    <input type="text" id="roomNumber" class="form-control" placeholder="مثال: A101">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" id="cancelScheduleBtn"
+                        style="flex: 1; background: #e5e7eb; color: #374151; border: 2px solid #d1d5db;">إلغاء</button>
+                    <button type="submit" class="btn btn-primary"
+                        style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/schedules.js"></script>
+</body>
+
+</html>

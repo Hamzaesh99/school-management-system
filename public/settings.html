@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات النظام | لوحة التحكم</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--primary-green);
+            color: white;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: auto;
+            margin-right: 0;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-back:hover {
+            background-color: var(--orange-700);
+            transform: translateX(5px);
+        }
+
+        .btn-back:active {
+            transform: translateX(5px) scale(0.98);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar will be loaded here -->
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <a href="javascript:history.back()" class="btn-back" title="العودة إلى الخلف">← رجوع</a>
+                    <span class="breadcrumb-item">لوحة التحكم</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">إعدادات النظام</span>
+                </div>
+            </header>
+
+            <div class="settings-container">
+                <h2 class="mb-4">إعدادات النظام العامة</h2>
+                <form id="settingsForm">
+                    <div class="form-section">
+                        <h3>معلومات الاتصال</h3>
+                        <div class="form-group">
+                            <label class="form-label">البريد الإلكتروني للتواصل</label>
+                            <input type="email" class="form-control" name="contact_email"
+                                placeholder="email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="text" class="form-control" name="contact_phone" placeholder="+218...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">العنوان</label>
+                            <input type="text" class="form-control" name="contact_address"
+                                placeholder="المدينة، الدولة">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>روابط التواصل الاجتماعي</h3>
+                        <div class="form-group">
+                            <label class="form-label">رابط فيسبوك</label>
+                            <input type="url" class="form-control" name="facebook_url"
+                                placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رابط تويتر (X)</label>
+                            <input type="url" class="form-control" name="twitter_url"
+                                placeholder="https://twitter.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رابط انستغرام</label>
+                            <input type="url" class="form-control" name="instagram_url"
+                                placeholder="https://instagram.com/...">
+                        </div>
+                    </div>
+
+                    <div class="text-left">
+                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const auth = checkAuth();
+            if (!auth || auth.user.role !== 'admin') {
+                window.location.href = '/dashboard';
+                return;
+            }
+
+            // Load Settings
+            try {
+                const response = await fetch(`${API_URL}/settings`);
+                const data = await response.json();
+                if (data.success) {
+                    const settings = data.data;
+                    const form = document.getElementById('settingsForm');
+
+                    for (const key in settings) {
+                        const input = form.elements[key];
+                        if (input) {
+                            input.value = settings[key];
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading settings:', e);
+                showToast('فشل تحميل الإعدادات', 'error');
+            }
+
+            // Save Settings
+            document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const updates = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch(`${API_URL}/settings`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${auth.token}`
+                        },
+                        body: JSON.stringify(updates)
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        showToast('تم حفظ الإعدادات بنجاح', 'success');
+                    } else {
+                        showToast('فشل حفظ الإعدادات', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error saving settings:', error);
+                    showToast('حدث خطأ', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

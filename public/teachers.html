@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المعلمين - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            /* RTL flipped */
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"><span id="userInitials">SM</span></div>
+                <div class="user-details">
+                    <h4 id="userName">مدير النظام</h4>
+                    <p id="userRole">إداري</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">لوحة
+                        التحكم</span></a>
+                <a href="/students" class="nav-item"><span class="nav-icon">👨‍🎓</span><span class="nav-text">إدارة
+                        الطلاب</span></a>
+                <a href="/teachers" class="nav-item active admin-only parent-only teacher-only"><span
+                        class="nav-icon">👨‍🏫</span><span class="nav-text">إدارة المعلمين</span></a>
+                <a href="/parents" class="nav-item"><span class="nav-icon">👥</span><span class="nav-text">أولياء
+                        الأمور</span></a>
+                <a href="/classes" class="nav-item"><span class="nav-icon">🏫</span><span class="nav-text">الصفوف
+                        والمواد</span></a>
+                <a href="/schedules" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">الجداول
+                        الدراسية</span></a>
+                <a href="/attendance" class="nav-item"><span class="nav-icon">✅</span><span class="nav-text">الحضور
+                        والغياب</span></a>
+                <a href="/grades" class="nav-item"><span class="nav-icon">📝</span><span
+                        class="nav-text">الدرجات</span></a>
+                <a href="/users-management" class="nav-item admin-only"><span class="nav-icon">👤</span><span
+                        class="nav-text">إدارة المستخدمين</span></a>
+                <a href="/profile.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="page-title">إدارة المعلمين</h1>
+                <button class="btn btn-primary" id="addTeacherBtn">+ إضافة معلم</button>
+            </header>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>رقم الموظف</th>
+                                <th>الاسم الكامل</th>
+                                <th>التخصص</th>
+                                <th>رقم الهاتف</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>تاريخ التعيين</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachersTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 2rem;">جاري تحميل البيانات...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Assignments Modal -->
+    <div class="modal" id="assignmentsModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="assignmentsModalTitle">تخصيص المواد للصفوف</h2>
+                <button class="close-modal" id="closeAssignmentsModal">&times;</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Form Side -->
+                <div>
+                    <h3>إضافة تخصيص جديد</h3>
+                    <form id="assignmentForm">
+                        <input type="hidden" id="assignTeacherId">
+
+                        <div class="form-group">
+                            <label class="form-label">السنة الدراسية</label>
+                            <input type="text" id="assignYear" class="form-control" list="yearOptions"
+                                placeholder="مثال: 2024-2025" required>
+                            <datalist id="yearOptions">
+                                <option value="2024-2025">
+                                <option value="2025-2026">
+                                <option value="2026-2027">
+                            </datalist>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">الفصل الدراسي</label>
+                            <select id="assignSemester" class="form-control" required>
+                                <option value="first">الفصل الأول</option>
+                                <option value="second">الفصل الثاني</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">الصف الدراسي</label>
+                            <select id="assignClass" class="form-control" required>
+                                <option value="">جاري التحميل...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <label class="form-label">المادة</label>
+                                <a href="/classes" target="_blank" style="font-size: 0.8rem; color: var(--purple);">+
+                                    إدارة المواد</a>
+                            </div>
+                            <select id="assignSubject" class="form-control" required>
+                                <option value="">جاري التحميل...</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                            <button type="button" class="btn btn-secondary" id="cancelAssignmentBtn"
+                                style="flex: 1; background: #e5e7eb; color: #374151; border: 1px solid #d1d5db;">إغلاق</button>
+                            <button type="submit" class="btn btn-primary" style="flex: 2;">إضافة التخصيص</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- List Side -->
+                <div
+                    style="background: #f9fafb; padding: 1rem; border-radius: 8px; display: flex; flex-direction: column;">
+                    <h3>المواد المخصصة للمعلم</h3>
+                    <div id="loadingAssignments" style="display: none; text-align: center;">جاري التحميل...</div>
+                    <ul id="assignmentsList"
+                        style="list-style: none; padding: 0; max-height: 400px; overflow-y: auto; flex-grow: 1;">
+                        <!-- Items will be injected here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        let allTeachers = []; // Global storage for teachers
+
+        async function loadTeachers() {
+            const auth = checkAuth();
+            if (!auth) return;
+
+            // Hide "Add Teacher" button for non-admins
+            if (auth.user.role !== 'admin') {
+                const addBtn = document.getElementById('addTeacherBtn');
+                if (addBtn) addBtn.style.display = 'none';
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/teachers`, {
+                    headers: { 'Authorization': `Bearer ${auth.token}` }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    allTeachers = data.data; // Store globally
+                    displayTeachers(allTeachers);
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+            }
+        }
+
+        async function deleteTeacher(id) {
+            const confirmed = await showConfirm(
+                'هل أنت متأكد من حذف هذا المعلم؟\nسيتم إزالة جميع صلاحياته وارتباطاته بالصفوف.',
+                'حذف المعلم',
+                'نعم، احذف',
+                'إلغاء'
+            );
+
+            if (!confirmed) return;
+
+            const auth = checkAuth();
+            try {
+                const response = await fetch(`${API_URL}/teachers/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${auth.token}` }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast('تم حذف المعلم بنجاح', 'success');
+                    loadTeachers();
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('خطأ:', error);
+                showToast('حدث خطأ في الخادم', 'error');
+            }
+        }
+
+        function displayTeachers(teachers) {
+            const tbody = document.getElementById('teachersTableBody');
+            const auth = checkAuth();
+            const isAdmin = auth && auth.user.role === 'admin';
+
+            if (teachers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = teachers.map(teacher => {
+                // تنسيق المواد كشارات (Badges)
+                let subjectsHtml = '<span style="color:#aaa">-</span>';
+                if (teacher.subjects_taught) {
+                    subjectsHtml = teacher.subjects_taught.split('،').map(s =>
+                        `<span style="
+                            background-color: #ecfdf5; 
+                            color: #047857; 
+                            border: 1px solid #a7f3d0;
+                            padding: 2px 8px; 
+                            border-radius: 12px; 
+                            font-size: 0.75rem; 
+                            display: inline-block; 
+                            margin: 2px;">
+                            ${s.trim()}
+                        </span>`
+                    ).join('');
+                }
+
+                // Hide actions column content for non-admins
+                const actionsHtml = isAdmin ? `
+                        <div class="action-btns">
+                            <button class="btn btn-primary btn-sm" onclick="openAssignmentsModal(${teacher.teacher_id})" style="background-color: var(--purple);">المواد والصفوف</button>
+                        </div>` : '<div style="color: grey; font-size: 0.8rem;">محمية</div>';
+
+                return `
+                <tr>
+                    <td>${teacher.employee_number || '-'}</td>
+                    <td>${teacher.full_name}</td>
+                    <td>
+                        <div style="font-size: 0.9em; font-weight: bold; margin-bottom: 4px;">${teacher.specialization || ''}</div>
+                        <div style="line-height: 1.6;">${subjectsHtml}</div>
+                    </td>
+                    <td>${teacher.phone || '-'}</td>
+                    <td>${teacher.email}</td>
+                    <td>${teacher.hire_date ? new Date(teacher.hire_date).toLocaleDateString('ar-SA') : '-'}</td>
+                    <td>
+                        ${actionsHtml}
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        // --- Assignments Logic ---
+
+        let currentTeacherId = null;
+
+        async function openAssignmentsModal(teacherId) {
+            console.log('Opening modal for teacher:', teacherId);
+            // Use loose comparison (==) to handle string/number differences
+            const teacher = allTeachers.find(t => t.teacher_id == teacherId);
+
+            if (!teacher) {
+                console.error('Teacher not found in local data. ID:', teacherId);
+                // Fallback: try to fetch teacher details directly if not found in list (though unlikely if list loaded)
+                return;
+            }
+
+            // ... rest of function ...
+
+            currentTeacherId = teacherId;
+            document.getElementById('assignTeacherId').value = teacherId;
+            document.getElementById('assignmentsModalTitle').textContent = `تخصيص المواد للمعلم: ${teacher.full_name}`;
+
+            document.getElementById('assignmentsModal').classList.add('active');
+
+            // Load dropdowns
+            loadDropdowns();
+            // Load current assignments
+            loadAssignments(teacherId);
+        }
+
+        // Ensure global access
+        window.openAssignmentsModal = openAssignmentsModal;
+        window.deleteTeacher = deleteTeacher;
+        window.removeAssignment = removeAssignment;
+
+        async function loadDropdowns() {
+            const auth = checkAuth();
+
+            // Load Classes
+            try {
+                const resClasses = await fetch(`${API_URL}/classes`, { headers: { 'Authorization': `Bearer ${auth.token}` } });
+                const dataClasses = await resClasses.json();
+                if (dataClasses.success) {
+                    document.getElementById('assignClass').innerHTML = '<option value="">اختر الصف...</option>' +
+                        dataClasses.data.map(c => `<option value="${c.class_id}">${c.class_name}</option>`).join('');
+                }
+            } catch (e) { console.error(e); }
+
+            // Load Subjects (Assuming API exists, if not need to create it)
+            try {
+                // If subjects API doesn't exist yet, this might fail. Assuming existence based on schema.
+                const resSubjects = await fetch(`${API_URL}/subjects`, { headers: { 'Authorization': `Bearer ${auth.token}` } });
+
+                if (resSubjects.ok) {
+                    const dataSubjects = await resSubjects.json();
+                    if (dataSubjects.success) {
+                        document.getElementById('assignSubject').innerHTML = '<option value="">اختر المادة...</option>' +
+                            dataSubjects.data.map(s => `<option value="${s.subject_id}">${s.subject_name}</option>`).join('');
+                    }
+                } else {
+                    // Fallback if API not found
+                    console.warn('Subjects API not found');
+                    document.getElementById('assignSubject').innerHTML = '<option value="">فشل تحميل المواد</option>';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadAssignments(teacherId) {
+            const auth = checkAuth();
+            const listEl = document.getElementById('assignmentsList');
+            const loader = document.getElementById('loadingAssignments');
+
+            listEl.innerHTML = '';
+            loader.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_URL}/teachers/${teacherId}/assignments`, {
+                    headers: { 'Authorization': `Bearer ${auth.token}` }
+                });
+                const data = await response.json();
+
+                loader.style.display = 'none';
+
+                if (data.success && data.data.length > 0) {
+                    listEl.innerHTML = data.data.map(item => `
+                        <li style="background: white; padding: 0.8rem; margin-bottom: 0.5rem; border-radius: 4px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${item.class_name}</strong> - ${item.subject_name}
+                                <br>
+                                <small style="color: gray;">${item.academic_year} (${item.semester === 'first' ? 'فصل 1' : 'فصل 2'})</small>
+                            </div>
+                            <button class="btn btn-sm btn-delete" onclick="removeAssignment(${item.class_subject_id})">🗑️</button>
+                        </li>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<li style="text-align: center; color: gray; padding: 1rem;">لا توجد مواد مخصصة بعد</li>';
+                }
+            } catch (error) {
+                loader.style.display = 'none';
+                console.error(error);
+                listEl.innerHTML = '<li style="color: red; text-align: center;">خطأ في التحميل</li>';
+            }
+        }
+
+        document.getElementById('assignmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const auth = checkAuth();
+
+            const payload = {
+                teacher_id: currentTeacherId,
+                class_id: document.getElementById('assignClass').value,
+                subject_id: document.getElementById('assignSubject').value,
+                academic_year: document.getElementById('assignYear').value,
+                semester: document.getElementById('assignSemester').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/teachers/assignments`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${auth.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('تم التخصيص بنجاح', 'success');
+                    loadAssignments(currentTeacherId);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('حدث خطأ', 'error');
+            }
+        });
+
+        async function removeAssignment(id) {
+            if (!confirm('هل تريد إزالة هذا التخصيص؟')) return;
+
+            const auth = checkAuth();
+            try {
+                const response = await fetch(`${API_URL}/teachers/assignments/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${auth.token}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('تمت الإزالة', 'success');
+                    loadAssignments(currentTeacherId);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        document.getElementById('closeAssignmentsModal').addEventListener('click', () => {
+            document.getElementById('assignmentsModal').classList.remove('active');
+        });
+
+        document.getElementById('cancelAssignmentBtn').addEventListener('click', () => {
+            document.getElementById('assignmentsModal').classList.remove('active');
+        });
+
+        document.getElementById('addTeacherBtn').addEventListener('click', () => {
+            showToast('نظام إضافة المعلمين يدار عبر "إدارة المستخدمين" لضمان تكامل الحسابات.', 'info');
+            setTimeout(() => {
+                window.location.href = '/users-management';
+            }, 2000);
+        });
+
+        document.addEventListener('DOMContentLoaded', loadTeachers);
+    </script>
+</body>
+
+</html>

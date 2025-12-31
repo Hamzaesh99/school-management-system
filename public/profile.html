@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإعدادات - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            background: var(--gradient-mixed);
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--white);
+        }
+
+        .profile-avatar-section {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .profile-avatar-large {
+            width: 150px;
+            height: 150px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-green);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-avatar-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-avatar-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--white);
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-avatar-large:hover .profile-avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-upload-input {
+            display: none;
+        }
+
+        .profile-info-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--primary-black);
+            font-weight: 500;
+        }
+
+        .edit-mode-input {
+            display: none;
+        }
+
+        .edit-mode .info-value {
+            display: none;
+        }
+
+        .edit-mode .edit-mode-input {
+            display: block;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .role-admin {
+            background: var(--gradient-secondary);
+            color: var(--white);
+        }
+
+        .role-teacher {
+            background: var(--gradient-mixed);
+            color: var(--white);
+        }
+
+        .role-student {
+            background: var(--gradient-primary);
+            color: var(--black);
+        }
+
+        .role-parent {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: var(--white);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .password-section {
+            background: var(--gray-50);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-top: 2rem;
+        }
+
+        .success-msg {
+            background: var(--success-light);
+            color: var(--success-dark);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: none;
+            border-right: 4px solid var(--success);
+        }
+
+        .success-msg.show {
+            display: block;
+        }
+
+        .error-msg {
+            background: var(--error-light);
+            color: var(--error-dark);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: none;
+            border-right: 4px solid var(--error);
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar">
+                    <span id="sidebarUserInitials">SM</span>
+                </div>
+                <div class="user-details">
+                    <h4 id="sidebarUserName">مدير النظام</h4>
+                    <p id="sidebarUserRole">إداري</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">لوحة
+                        التحكم</span></a>
+                <a href="/students" class="nav-item admin-only student-only"><span class="nav-icon">👨‍🎓</span><span
+                        class="nav-text">إدارة
+                        الطلاب</span></a>
+                <a href="/teachers" class="nav-item admin-only"><span class="nav-icon">👨‍🏫</span><span
+                        class="nav-text">إدارة
+                        المعلمين</span></a>
+                <a href="/parents" class="nav-item admin-only student-only"><span class="nav-icon">👥</span><span
+                        class="nav-text">أولياء
+                        الأمور</span></a>
+                <a href="/classes" class="nav-item admin-only teacher-only"><span class="nav-icon">🏫</span><span
+                        class="nav-text">الصفوف
+                        والمواد</span></a>
+                <a href="/schedules" class="nav-item student-only parent-only teacher-only"><span
+                        class="nav-icon">📅</span><span class="nav-text">الجداول
+                        الدراسية</span></a>
+                <a href="/attendance" class="nav-item teacher-only student-only parent-only"><span
+                        class="nav-icon">✅</span><span class="nav-text">الحضور
+                        والغياب</span></a>
+                <a href="/grades" class="nav-item student-only parent-only teacher-only"><span
+                        class="nav-icon">📝</span><span class="nav-text">الدرجات</span></a>
+                <a href="/users-management" class="nav-item admin-only"><span class="nav-icon">👤</span><span
+                        class="nav-text">إدارة المستخدمين</span></a>
+                <a href="/profile" class="nav-item active"><span class="nav-icon">👤</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h1 class="page-title">الملف الشخصي والإعدادات</h1>
+            </header>
+
+            <div class="profile-container">
+                <!-- Success/Error Messages -->
+                <div id="successMsg" class="success-msg"></div>
+                <div id="errorMsg" class="error-msg"></div>
+
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-large" id="profileAvatar">
+                            <span id="profileInitials">SM</span>
+                            <div class="profile-avatar-overlay"
+                                onclick="document.getElementById('avatarInput').click()">
+                                📷 تغيير الصورة
+                            </div>
+                        </div>
+                        <input type="file" id="avatarInput" class="avatar-upload-input" accept="image/*">
+                    </div>
+                    <h2 id="profileName">مدير النظام</h2>
+                    <p id="profileEmail">admin@school.com</p>
+                </div>
+
+                <!-- Profile Information Card -->
+                <div class="profile-info-card" id="profileInfoCard">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3>المعلومات الشخصية</h3>
+                        <button class="btn btn-primary btn-sm" id="editBtn" onclick="toggleEditMode()">
+                            ✏️ تعديل
+                        </button>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label class="info-label">الاسم الكامل</label>
+                            <div class="info-value" id="displayName">مدير النظام</div>
+                            <input type="text" class="form-control edit-mode-input" id="editName">
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">البريد الإلكتروني</label>
+                            <div class="info-value" id="displayEmail">admin@school.com</div>
+                            <input type="email" class="form-control edit-mode-input" id="editEmail">
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">رقم الهاتف</label>
+                            <div class="info-value" id="displayPhone">+218 91 234 5678</div>
+                            <input type="tel" class="form-control edit-mode-input" id="editPhone">
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">الدور في النظام</label>
+                            <div class="info-value">
+                                <span class="role-badge" id="roleBadge">مدير</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons" style="display: none;" id="actionButtons">
+                        <button class="btn btn-secondary" onclick="cancelEdit()">إلغاء</button>
+                        <button class="btn btn-primary" onclick="saveProfile()">💾 حفظ التغييرات</button>
+                    </div>
+                </div>
+
+                <!-- Change Password Section -->
+                <div class="profile-info-card">
+                    <h3 style="margin-bottom: 1.5rem;">تغيير كلمة المرور</h3>
+
+                    <div class="password-section">
+                        <form id="passwordForm">
+                            <div class="form-group">
+                                <label class="form-label">كلمة المرور الحالية</label>
+                                <input type="password" id="currentPassword" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">كلمة المرور الجديدة</label>
+                                <input type="password" id="newPassword" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">تأكيد كلمة المرور الجديدة</label>
+                                <input type="password" id="confirmPassword" class="form-control" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">🔒 تحديث كلمة المرور</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        let editMode = false;
+        let userData = null;
+
+        // Load user profile
+        function loadProfile() {
+            const auth = checkAuth();
+            if (!auth) return;
+
+            userData = auth.user;
+
+            // Display user data
+            document.getElementById('profileName').textContent = userData.full_name;
+            document.getElementById('profileEmail').textContent = userData.email;
+            document.getElementById('displayName').textContent = userData.full_name;
+            document.getElementById('displayEmail').textContent = userData.email;
+            document.getElementById('displayPhone').textContent = userData.phone || 'غير محدد';
+
+            // Set initials
+            const initials = userData.full_name.split(' ').slice(0, 2).map(n => n[0]).join('');
+            document.getElementById('profileInitials').textContent = initials;
+            document.getElementById('sidebarUserInitials').textContent = initials;
+            document.getElementById('sidebarUserName').textContent = userData.full_name;
+
+            // Set role badge
+            const roleBadge = document.getElementById('roleBadge');
+            const roleMapping = {
+                'admin': { text: 'مدير', class: 'role-admin' },
+                'teacher': { text: 'معلم', class: 'role-teacher' },
+                'student': { text: 'طالب', class: 'role-student' },
+                'parent': { text: 'ولي أمر', class: 'role-parent' }
+            };
+
+            const role = roleMapping[userData.role] || { text: userData.role, class: 'role-admin' };
+            roleBadge.textContent = role.text;
+            roleBadge.className = 'role-badge ' + role.class;
+            document.getElementById('sidebarUserRole').textContent = role.text;
+
+            // Load avatar if exists
+            if (userData.avatar_url) {
+                displayAvatar(userData.avatar_url);
+            }
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            editMode = !editMode;
+            const card = document.getElementById('profileInfoCard');
+            const actionButtons = document.getElementById('actionButtons');
+            const editBtn = document.getElementById('editBtn');
+
+            if (editMode) {
+                card.classList.add('edit-mode');
+                actionButtons.style.display = 'flex';
+                editBtn.style.display = 'none';
+
+                // Fill input values
+                document.getElementById('editName').value = userData.full_name;
+                document.getElementById('editEmail').value = userData.email;
+                document.getElementById('editPhone').value = userData.phone || '';
+            } else {
+                card.classList.remove('edit-mode');
+                actionButtons.style.display = 'none';
+                editBtn.style.display = 'block';
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            toggleEditMode();
+        }
+
+        // Save profile
+        async function saveProfile() {
+            const auth = checkAuth();
+            if (!auth) return;
+
+            const updatedData = {
+                full_name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/users/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${auth.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update local storage
+                    userData = { ...userData, ...updatedData };
+                    localStorage.setItem('user', JSON.stringify(userData));
+
+                    showSuccess('تم تحديث البيانات بنجاح');
+                    loadProfile();
+                    toggleEditMode();
+                } else {
+                    showError(data.message || 'حدث خطأ أثناء التحديث');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('حدث خطأ أثناء الاتصال بالخادم');
+            }
+        }
+
+        // Handle avatar upload
+        document.getElementById('avatarInput').addEventListener('change', async function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showError('حجم الصورة يجب أن لا يتجاوز 2 ميجابايت');
+                return;
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showError('يرجى اختيار صورة صالحة');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            const auth = checkAuth();
+            if (!auth) return;
+
+            try {
+                const response = await fetch(`${API_URL}/users/avatar`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${auth.token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayAvatar(data.data.avatar_url);
+                    showSuccess('تم تحديث الصورة بنجاح');
+
+                    // Update user data
+                    userData.avatar_url = data.data.avatar_url;
+                    localStorage.setItem('user', JSON.stringify(userData));
+                } else {
+                    showError(data.message || 'حدث خطأ أثناء رفع الصورة');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('حدث خطأ أثناء رفع الصورة');
+            }
+        });
+
+        // Display avatar
+        function displayAvatar(url) {
+            const avatarDiv = document.getElementById('profileAvatar');
+            const initials = document.getElementById('profileInitials');
+
+            // Create img element
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Profile';
+
+            // Remove initials and add image
+            initials.style.display = 'none';
+            avatarDiv.appendChild(img);
+        }
+
+        // Change password
+        document.getElementById('passwordForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate
+            if (newPassword !== confirmPassword) {
+                showError('كلمة المرور الجديدة غير متطابقة');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+                return;
+            }
+
+            const auth = checkAuth();
+            if (!auth) return;
+
+            try {
+                const response = await fetch(`${API_URL}/users/change-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${auth.token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showSuccess('تم تغيير كلمة المرور بنجاح');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    showError(data.message || 'كلمة المرور الحالية غير صحيحة');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('حدث خطأ أثناء تغيير كلمة المرور');
+            }
+        });
+
+        // Show success message
+        function showSuccess(message) {
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = message;
+            successMsg.classList.add('show');
+            setTimeout(() => successMsg.classList.remove('show'), 5000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+            setTimeout(() => errorMsg.classList.remove('show'), 5000);
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar">
+                    <span id="userInitials">SM</span>
+                </div>
+                <div class="user-details">
+                    <h4 id="userName">مدير النظام</h4>
+                    <p id="userRole">إداري</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">لوحة التحكم</span>
+                </a>
+                <a href="/students" class="nav-item admin-only teacher-only student-only">
+                    <span class="nav-icon">👨‍🎓</span>
+                    <span class="nav-text">إدارة الطلاب</span>
+                </a>
+                <a href="/teachers" class="nav-item admin-only">
+                    <span class="nav-icon">👨‍🏫</span>
+                    <span class="nav-text">إدارة المعلمين</span>
+                </a>
+                <a href="/parents" class="nav-item admin-only student-only">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">أولياء الأمور</span>
+                </a>
+                <a href="/classes" class="nav-item admin-only teacher-only">
+                    <span class="nav-icon">🏫</span>
+                    <span class="nav-text">الصفوف والمواد</span>
+                </a>
+                <a href="/schedules" class="nav-item student-only parent-only teacher-only">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">الجداول الدراسية</span>
+                </a>
+                <a href="/attendance" class="nav-item teacher-only student-only parent-only">
+                    <span class="nav-icon">✅</span>
+                    <span class="nav-text">الحضور والغياب</span>
+                </a>
+                <a href="/grades" class="nav-item student-only parent-only teacher-only">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">الدرجات</span>
+                </a>
+                <a href="/users-management" class="nav-item admin-only">
+                    <span class="nav-icon">👤</span>
+                    <span class="nav-text">إدارة المستخدمين</span>
+                </a>
+                <a href="/settings" class="nav-item admin-only">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">إعدادات النظام</span>
+                </a>
+                <a href="/profile.html" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">الملف الشخصي</span>
+                </a>
+                <a href="#" class="nav-item" id="logoutBtn">
+                    <span class="nav-icon">🚪</span>
+                    <span class="nav-text">تسجيل الخروج</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h1 class="page-title">لوحة التحكم</h1>
+                <div class="header-actions">
+                    <div class="notification-container">
+                        <button class="notification-btn" id="notificationBtn">
+                            <span class="notification-icon">🔔</span>
+                            <span class="notification-badge" id="notificationBadge">3</span>
+                        </button>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="dropdown-header">
+                                <span>التنبيهات</span>
+                                <button id="markReadBtn">تحديد كالمقروء</button>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <!-- Notifications will load here -->
+                                <p class="empty-msg">لا توجد تنبيهات جديدة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be loaded here dynamically -->
+            </div>
+
+            <!-- Quick Actions للمدير -->
+            <div class="admin-only" id="adminActions" style="margin: 2rem 0; display: none;">
+                <div class="card bg-gradient-secondary text-white p-6">
+                    <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>👤</span> <span>إدارة النظام</span>
+                    </h3>
+                    <p style="margin: 0 0 1.5rem 0; opacity: 0.9;">إدارة حسابات المستخدمين، المعلمين، والطلاب.</p>
+                    <a href="/users-management" class="btn-action-card">
+                        <span>إدارة المستخدمين</span>
+                        <span class="arrow-icon">←</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Actions للمعلم -->
+            <div class="teacher-only" id="teacherActions" style="margin: 2rem 0; display: none;">
+                <div class="card bg-gradient-secondary text-white p-6">
+                    <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>👨‍🏫</span> <span>بوابة المعلم</span>
+                    </h3>
+                    <p style="margin: 0 0 1.5rem 0; opacity: 0.9;">إدارة الدرجات، تسجيل الحضور، ومراجعة الجداول.</p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <a href="/grades"
+                            style="display: inline-block; padding: 0.75rem 2rem; background: white; color: #7C3AED; text-decoration: none; border-radius: var(--radius); font-weight: 700;">رصد
+                            الدرجات</a>
+                        <a href="/attendance"
+                            style="display: inline-block; padding: 0.75rem 2rem; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: var(--radius); font-weight: 700; border: 1px solid white;">تسجيل
+                            الحضور</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions للطالب -->
+            <div class="student-only" id="studentActions" style="margin: 2rem 0; display: none;">
+                <div class="card bg-gradient-primary text-white p-6">
+                    <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>👨‍🎓</span> <span>بوابة الطالب</span>
+                    </h3>
+                    <p style="margin: 0 0 1.5rem 0; opacity: 0.9;">عرض درجاتك، جدولك الدراسي، وحقيبتك التعليمية.</p>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <a href="/grades"
+                            style="display: inline-block; padding: 0.75rem 2rem; background: white; color: #059669; text-decoration: none; border-radius: var(--radius); font-weight: 700;">نتائجي
+                            الدراسية</a>
+                        <a href="/schedules"
+                            style="display: inline-block; padding: 0.75rem 2rem; background: rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: var(--radius); font-weight: 700; border: 1px solid white;">جدولي
+                            الدراسي</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions لولي الأمر -->
+            <div class="parent-only" id="parentActions" style="margin: 2rem 0; display: none;">
+                <div class="card bg-gradient-primary text-white p-6">
+                    <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>👨‍👩‍👦</span> <span>بوابة ولي الأمر</span>
+                    </h3>
+                    <p style="margin: 0 0 1.5rem 0; opacity: 0.9;">متابعة مستوى أبنائك، غيابهم، وتواصل مع المدرسة.</p>
+                    <a href="/parent-view"
+                        style="display: inline-block; padding: 0.75rem 2rem; background: white; color: #E67348; text-decoration: none; border-radius: var(--radius); font-weight: 700;">متابعة
+                        الأبناء ←</a>
+                </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="content-grid">
+                <!-- Recent Announcements -->
+                <section class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin-bottom: 0;">الإعلانات الأخيرة</h3>
+                        <button id="addAnnouncementBtn" class="btn btn-sm btn-primary admin-only"
+                            style="padding: 0.5rem 1rem; width: auto; font-size: 1.2rem; display: none;">+</button>
+                    </div>
+                    <div id="announcementsList" class="announcements-list">
+                        <!-- Announcements will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- New Messages -->
+                <section class="card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 class="section-title" style="margin-bottom: 0;">الرسائل الجديدة</h3>
+                        <button id="sendMessageBtn" class="btn btn-sm btn-primary"
+                            style="padding: 0.5rem 1rem; width: auto; font-size: 1.2rem;">+</button>
+                    </div>
+                    <div id="messagesList" class="messages-list">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Announcement Modal -->
+    <div class="modal-overlay" id="addAnnouncementModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">إضافة إعلان جديد</h3>
+                <button class="modal-close" onclick="closeModal('addAnnouncementModal')">×</button>
+            </div>
+            <form id="addAnnouncementForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">عنوان الإعلان</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">التفاصيل</label>
+                        <textarea name="content" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">موجه لـ</label>
+                        <select name="target_role" class="form-control">
+                            <option value="all">الجميع</option>
+                            <option value="teacher">المعلمين</option>
+                            <option value="student">الطلاب</option>
+                            <option value="parent">أولياء الأمور</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الأهمية</label>
+                        <select name="priority" class="form-control">
+                            <option value="medium">متوسطة</option>
+                            <option value="high">عالية</option>
+                            <option value="low">منخفضة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">تاريخ الانتهاء</label>
+                        <input type="date" name="expiry_date" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary"
+                        onclick="closeModal('addAnnouncementModal')">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">نشر الإعلان</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Send Message Modal -->
+    <div class="modal-overlay" id="sendMessageModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">إرسال رسالة جديدة</h3>
+                <button class="modal-close" onclick="closeModal('sendMessageModal')">×</button>
+            </div>
+            <form id="sendMessageForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">المستلم</label>
+                        <select name="receiver_id" id="msgReceiverSelect" class="form-control" required>
+                            <option value="">جاري التحميل...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">الموضوع</label>
+                        <input type="text" name="subject" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">نص الرسالة</label>
+                        <textarea name="message_text" class="form-control" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary"
+                        onclick="closeModal('sendMessageModal')">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إرسال</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+
+</html>

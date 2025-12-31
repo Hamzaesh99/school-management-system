@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدرجات - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <!-- Duplicate CSS from Attendance for consistency -->
+    <style>
+        .page-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 0;
+            border-radius: 16px;
+            width: 95%;
+            max-width: 600px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: 90vh;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: #fff;
+            color: #64748b;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fee2e2;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .badge-midterm {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-final {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-quiz {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-assignment {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"><span id="userInitials">SM</span></div>
+                <div class="user-details">
+                    <h4 id="userName">مدير النظام</h4>
+                    <p id="userRole">إداري</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">لوحة
+                        التحكم</span></a>
+                <a href="/students" class="nav-item admin-only student-only"><span class="nav-icon">👨‍🎓</span><span
+                        class="nav-text">إدارة
+                        الطلاب</span></a>
+                <a href="/teachers" class="nav-item admin-only"><span class="nav-icon">👨‍🏫</span><span
+                        class="nav-text">إدارة
+                        المعلمين</span></a>
+                <a href="/parents" class="nav-item admin-only student-only"><span class="nav-icon">👥</span><span
+                        class="nav-text">أولياء
+                        الأمور</span></a>
+                <a href="/classes" class="nav-item admin-only teacher-only"><span class="nav-icon">🏫</span><span
+                        class="nav-text">الصفوف
+                        والمواد</span></a>
+                <a href="/schedules" class="nav-item student-only parent-only teacher-only"><span
+                        class="nav-icon">📅</span><span class="nav-text">الجداول
+                        الدراسية</span></a>
+                <a href="/attendance" class="nav-item teacher-only student-only parent-only"><span
+                        class="nav-icon">✅</span><span class="nav-text">الحضور
+                        والغياب</span></a>
+                <a href="/grades" class="nav-item active student-only parent-only teacher-only"><span
+                        class="nav-icon">📝</span><span class="nav-text">الدرجات</span></a>
+                <a href="/users-management" class="nav-item admin-only"><span class="nav-icon">👤</span><span
+                        class="nav-text">إدارة المستخدمين</span></a>
+                <a href="/profile.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="page-title">إدارة الدرجات</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="exportPdfBtn">
+                        <span class="icon">📄</span> تحميل PDF
+                    </button>
+                    <!-- Visible only for Teachers -->
+                    <button class="btn btn-primary" id="openGradeModalBtn" style="display: none;">
+                        <span class="icon">➕</span> إضافة درجة
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-filters">
+                <div style="flex: 1; min-width: 200px;">
+                    <select id="filterClass" class="form-control">
+                        <option value="">كل الصفوف</option>
+                    </select>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <select id="filterSubject" class="form-control">
+                        <option value="">كل المواد</option>
+                    </select>
+                </div>
+                <button id="filterBtn" class="btn btn-secondary">
+                    عرض الدرجات 🔍
+                </button>
+            </div>
+
+            <div class="card" id="gradesCard">
+                <h3>سجلات الدرجات</h3>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>اسم الطالب</th>
+                                <th>الصف</th>
+                                <th>المادة</th>
+                                <th>نوع الامتحان</th>
+                                <th>اسم الامتحان</th>
+                                <th>الدرجة</th>
+                                <th>النسبة</th>
+                                <th>التاريخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gradesTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem;">جاري تحميل البيانات...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Grade Modal -->
+    <div class="modal" id="gradeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>إضافة درجة جديدة</h2>
+                <button class="close-modal" id="closeGradeModal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="gradeForm">
+                    <div class="form-group">
+                        <label>الصف الدراسي</label>
+                        <select id="modalClass" class="form-control" required>
+                            <option value="">اختر الصف...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المادة</label>
+                        <select id="modalSubject" class="form-control" required>
+                            <option value="">اختر المادة...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الطالب</label>
+                        <select id="modalStudent" class="form-control" required>
+                            <option value="">-- اختر الطالب --</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>نوع التقييم</label>
+                            <select id="examType" class="form-control" required>
+                                <option value="quiz">اختبار قصير</option>
+                                <option value="midterm">منتصف الفصل</option>
+                                <option value="final">نهائي</option>
+                                <option value="assignment">واجب</option>
+                                <option value="practical">عملي</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>اسم الامتحان/الواجب</label>
+                            <input type="text" id="examName" class="form-control" placeholder="مثال: الاختبار الأول">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>الدرجة المستحقة</label>
+                            <input type="number" id="gradeValue" class="form-control" step="0.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الدرجة العظمى</label>
+                            <input type="number" id="maxGrade" class="form-control" value="100" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تاريخ التقييم</label>
+                        <input type="date" id="examDate" class="form-control" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" form="gradeForm" class="btn btn-success btn-lg">
+                    <span class="icon">💾</span> حفظ الدرجة
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/grades.js"></script>
+</body>
+
+</html>

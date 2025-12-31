@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض ولي الأمر - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"><span id="userInitials">PA</span></div>
+                <div class="user-details">
+                    <h4 id="userName">ولي أمر</h4>
+                    <p id="userRole">ولي أمر</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/parent-view" class="nav-item active"><span class="nav-icon">📊</span><span
+                        class="nav-text">متابعة الأبناء</span></a>
+                <a href="/profile.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="page-title">متابعة أداء الأبناء</h1>
+            </header>
+
+            <!-- اختيار الابن -->
+            <div id="childrenList" class="children-selector mb-4">
+                <!-- سيتم تحميل الأبناء هنا -->
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="avgGrade">0%</div>
+                            <div class="stat-label">المعدل العام</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%)">📊
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="attendanceRate">0%</div>
+                            <div class="stat-label">نسبة الحضور</div>
+                        </div>
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, var(--calm-blue) 0%, var(--calm-blue-dark) 100%)">
+                            ✅</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="subjectsCount">0</div>
+                            <div class="stat-label">عدد المواد</div>
+                        </div>
+                        <div class="stat-icon"
+                            style="background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%)">📚
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <!-- الدرجات الأخيرة -->
+                <div class="card">
+                    <h3>الدرجات الأخيرة</h3>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>المادة</th>
+                                    <th>الامتحان</th>
+                                    <th>الدرجة</th>
+                                    <th>التقدير</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gradesTableBody">
+                                <!-- سيتم تحميل الدرجات هنا -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- الحضور الأخير -->
+                <div class="card">
+                    <h3>سجل الحضور والغياب</h3>
+                    <div id="attendanceHistory" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- سيتم تحميل الحضور هنا -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .children-selector {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .child-selector-card {
+            background: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            min-width: 200px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .child-selector-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .child-selector-card.active {
+            border-color: var(--calm-blue);
+            background: #f0f7ff;
+        }
+
+        .child-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--gray-100);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .child-info h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .child-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+    </style>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/parent-view.js"></script>
+</body>
+
+</html>

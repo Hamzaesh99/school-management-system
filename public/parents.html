@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة أولياء الأمور - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"><span id="userInitials">SM</span></div>
+                <div class="user-details">
+                    <h4 id="userName">مدير النظام</h4>
+                    <p id="userRole">إداري</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">لوحة
+                        التحكم</span></a>
+                <a href="/students" class="nav-item"><span class="nav-icon">👨‍🎓</span><span class="nav-text">إدارة
+                        الطلاب</span></a>
+                <a href="/teachers" class="nav-item"><span class="nav-icon">👨‍🏫</span><span class="nav-text">إدارة
+                        المعلمين</span></a>
+                <a href="/parents" class="nav-item active admin-only teacher-only student-only"><span
+                        class="nav-icon">👥</span><span class="nav-text">أولياء
+                        الأمور</span></a>
+                <a href="/classes" class="nav-item"><span class="nav-icon">🏫</span><span class="nav-text">الصفوف
+                        والمواد</span></a>
+                <a href="/schedules" class="nav-item"><span class="nav-icon">📅</span><span class="nav-text">الجداول
+                        الدراسية</span></a>
+                <a href="/attendance" class="nav-item"><span class="nav-icon">✅</span><span class="nav-text">الحضور
+                        والغياب</span></a>
+                <a href="/grades" class="nav-item"><span class="nav-icon">📝</span><span
+                        class="nav-text">الدرجات</span></a>
+                <a href="/users-management" class="nav-item admin-only"><span class="nav-icon">👤</span><span
+                        class="nav-text">إدارة المستخدمين</span></a>
+                <a href="/profile.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="page-title">إدارة أولياء الأمور</h1>
+                <button class="btn btn-primary" id="addParentBtn">+ إضافة ولي أمر</button>
+            </header>
+
+            <div class="card">
+                <h3>قائمة أولياء الأمور</h3>
+                <p style="color: var(--gray-600); margin-bottom: 1.5rem;">
+                    يمكن لأولياء الأمور متابعة أداء أبنائهم ومشاهدة الدرجات والحضور
+                </p>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>الاسم الكامل</th>
+                                <th>رقم الهاتف</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>عدد الأبناء</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parentsTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem;">لا توجد بيانات متاحة حالياً
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Edit Parent Modal -->
+        <div class="modal" id="editParentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>تعديل بيانات ولي الأمر</h2>
+                    <button class="close-modal" onclick="closeEditModal()">&times;</button>
+                </div>
+                <form id="editParentForm">
+                    <input type="hidden" id="editParentId">
+                    <div class="form-group">
+                        <label class="form-label">الاسم الكامل</label>
+                        <input type="text" id="editFullName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رقم الهاتف</label>
+                        <input type="text" id="editPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <input type="email" id="editEmail" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">العنوان</label>
+                        <input type="text" id="editAddress" class="form-control">
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()"
+                            style="flex: 1;">إلغاء</button>
+                        <button type="submit" class="btn btn-primary" style="flex: 2;">حفظ التغييرات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .modal.active {
+                display: flex;
+            }
+
+            .modal-content {
+                background: white;
+                padding: 2rem;
+                border-radius: 12px;
+                width: 90%;
+                max-width: 500px;
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .close-modal {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        </style>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/parents.js"></script>
+</body>
+
+</html>

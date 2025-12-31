@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفوف والمواد - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-small"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h3 class="sidebar-title">نظام المدرسة</h3>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar"><span id="userInitials">SM</span></div>
+                <div class="user-details">
+                    <h4 id="userName">مدير النظام</h4>
+                    <p id="userRole">إداري</p>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/dashboard" class="nav-item"><span class="nav-icon">📊</span><span class="nav-text">لوحة
+                        التحكم</span></a>
+                <a href="/students" class="nav-item admin-only student-only"><span class="nav-icon">👨‍🎓</span><span
+                        class="nav-text">إدارة
+                        الطلاب</span></a>
+                <a href="/teachers" class="nav-item admin-only"><span class="nav-icon">👨‍🏫</span><span
+                        class="nav-text">إدارة
+                        المعلمين</span></a>
+                <a href="/parents" class="nav-item admin-only student-only"><span class="nav-icon">👥</span><span
+                        class="nav-text">أولياء
+                        الأمور</span></a>
+                <a href="/classes" class="nav-item active admin-only teacher-only"><span class="nav-icon">🏫</span><span
+                        class="nav-text">الصفوف
+                        والمواد</span></a>
+                <a href="/schedules" class="nav-item student-only parent-only teacher-only"><span
+                        class="nav-icon">📅</span><span class="nav-text">الجداول
+                        الدراسية</span></a>
+                <a href="/attendance" class="nav-item teacher-only student-only parent-only"><span
+                        class="nav-icon">✅</span><span class="nav-text">الحضور
+                        والغياب</span></a>
+                <a href="/grades" class="nav-item student-only parent-only teacher-only"><span
+                        class="nav-icon">📝</span><span class="nav-text">الدرجات</span></a>
+                <a href="/users-management" class="nav-item admin-only"><span class="nav-icon">👤</span><span
+                        class="nav-text">إدارة المستخدمين</span></a>
+                <a href="/profile.html" class="nav-item"><span class="nav-icon">⚙️</span><span class="nav-text">الملف
+                        الشخصي</span></a>
+                <a href="#" class="nav-item" id="logoutBtn"><span class="nav-icon">🚪</span><span class="nav-text">تسجيل
+                        الخروج</span></a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <h1 class="page-title">الصفوف والمواد الدراسية</h1>
+            </header>
+
+            <div class="row" style="gap: 1.5rem;">
+                <!-- الصفوف الدراسية -->
+                <div class="col-6">
+                    <div class="card">
+                        <div class="d-flex justify-between align-center mb-3">
+                            <h3>الصفوف الدراسية</h3>
+                            <button class="btn btn-primary btn-sm">+ إضافة صف</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>اسم الصف</th>
+                                        <th>المستوى</th>
+                                        <th>عدد الطلاب</th>
+                                        <th>معلم الصف</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="classesTableBody">
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem;">جاري التحميل...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- المواد الدراسية -->
+                <div class="col-6">
+                    <div class="card">
+                        <div class="d-flex justify-between align-center mb-3">
+                            <h3>المواد الدراسية</h3>
+                            <button class="btn btn-secondary btn-sm">+ إضافة مادة</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>اسم المادة</th>
+                                        <th>رمز المادة</th>
+                                        <th>الساعات</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjectsTableBody">
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; padding: 2rem;">جاري التحميل...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Class Modal -->
+        <div class="modal" id="classModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="classModalTitle">إضافة صف جديد</h2>
+                    <button class="close-modal" id="closeClassModal">&times;</button>
+                </div>
+                <form id="classForm">
+                    <input type="hidden" id="classId">
+                    <div class="form-group">
+                        <label class="form-label">اسم الصف</label>
+                        <input type="text" id="className" class="form-control" required
+                            placeholder="مثال: الصف الأول (أ)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">المستوى الدراسي</label>
+                        <input type="number" id="gradeLevel" class="form-control" required min="1" max="12">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">السنة الدراسية</label>
+                        <input type="text" id="academicYear" class="form-control" required value="2024-2025"
+                            placeholder="مثال: 2024-2025">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">معلم الصف (اختياري)</label>
+                        <select id="classTeacher" class="form-control">
+                            <option value="">اختر المعلم...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الحد الأقصى للطلاب</label>
+                        <input type="number" id="maxStudents" class="form-control" value="30">
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" id="cancelClassBtn"
+                            style="flex: 1; background: #e5e7eb; color: #374151; border: 2px solid #d1d5db;">إلغاء</button>
+                        <button type="submit" class="btn btn-primary"
+                            style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">حفظ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Subject Modal -->
+        <div class="modal" id="subjectModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="subjectModalTitle">إضافة مادة جديدة</h2>
+                    <button class="close-modal" id="closeSubjectModal">&times;</button>
+                </div>
+                <form id="subjectForm">
+                    <input type="hidden" id="subjectId">
+                    <div class="form-group">
+                        <label class="form-label">اسم المادة</label>
+                        <input type="text" id="subjectName" class="form-control" required placeholder="مثال: الرياضيات">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رمز المادة</label>
+                        <input type="text" id="subjectCode" class="form-control" required placeholder="مثال: MATH101">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">عدد الساعات</label>
+                        <input type="number" id="creditHours" class="form-control" required value="3" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الوصف (اختياري)</label>
+                        <textarea id="subjectDescription" class="form-control" rows="3"
+                            placeholder="وصف مختصر للمادة"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" class="btn btn-secondary" id="cancelSubjectBtn"
+                            style="flex: 1; background: #e5e7eb; color: #374151; border: 2px solid #d1d5db;">إلغاء</button>
+                        <button type="submit" class="btn btn-primary"
+                            style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">حفظ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.65);
+                backdrop-filter: blur(5px);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                animation: modalFadeIn 0.3s ease;
+            }
+
+            @keyframes modalFadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .modal.active {
+                display: flex;
+            }
+
+            .modal-content {
+                background: white;
+                padding: 2.5rem;
+                border-radius: 16px;
+                width: 90%;
+                max-width: 550px;
+                position: relative;
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+                animation: modalSlideUp 0.3s ease;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            @keyframes modalSlideUp {
+                from {
+                    transform: translateY(50px);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid #e5e7eb;
+            }
+
+            .modal-header h2 {
+                margin: 0 !important;
+                color: #1e3a8a;
+                font-size: 1.5rem;
+                font-weight: 700;
+            }
+
+            .close-modal {
+                background: #fee2e2;
+                color: #dc2626;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-weight: bold;
+            }
+
+            .close-modal:hover {
+                background: #dc2626;
+                color: white;
+                transform: rotate(90deg);
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            .form-label {
+                font-weight: 600;
+                color: #374151;
+                margin-bottom: 0.5rem;
+                display: block;
+                font-size: 0.95rem;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 0.75rem;
+                border: 2px solid #d1d5db;
+                border-radius: 8px;
+                font-size: 1rem;
+                transition: all 0.3s;
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #10b981;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            }
+
+            .btn-secondary:hover {
+                background: #d1d5db !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+            }
+        </style>
+
+        <script src="/js/common.js"></script>
+        <script>
+            let allClasses = [];
+            let allTeachers = [];
+            let allSubjects = []; // Add global subjects array
+
+            async function loadClasses() {
+                const auth = checkAuth();
+                if (!auth) return;
+
+                try {
+                    const response = await fetch(`${API_URL}/classes`, {
+                        headers: { 'Authorization': `Bearer ${auth.token}` }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        allClasses = data.data;
+                        displayClasses(allClasses);
+                    }
+                } catch (error) {
+                    console.error('خطأ:', error);
+                }
+            }
+
+            async function loadTeachersDropdown() {
+                const auth = checkAuth();
+                try {
+                    const response = await fetch(`${API_URL}/teachers`, {
+                        headers: { 'Authorization': `Bearer ${auth.token}` }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        allTeachers = data.data;
+                        const select = document.getElementById('classTeacher');
+                        // Keep the first option
+                        select.innerHTML = '<option value="">اختر المعلم...</option>' +
+                            allTeachers.map(t => `<option value="${t.user_id}">${t.full_name}</option>`).join('');
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            function displayClasses(classes) {
+                const tbody = document.getElementById('classesTableBody');
+                const auth = checkAuth();
+                const isStudent = auth && auth.user.role === 'student';
+
+                if (classes.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">لا توجد صفوف</td></tr>'; // Increased colspan
+                    return;
+                }
+
+                tbody.innerHTML = classes.map(cls => `
+                <tr>
+                    <td>${cls.class_name}</td>
+                    <td>المستوى ${cls.grade_level}</td>
+                    <td>${cls.max_students || '-'}</td>
+                    <td>${cls.teacher_name || '<span style="color:#aaa">غير محدد</span>'}</td>
+                    <td>
+                        ${!isStudent ? `<button class="btn btn-sm btn-secondary" onclick="openClassModal(${cls.class_id})">تعديل</button>` : '<span class="text-muted" style="color: gray;">عرض فقط</span>'}
+                    </td>
+                </tr>
+            `).join('');
+            }
+
+            function openClassModal(classId = null) {
+                const modal = document.getElementById('classModal');
+                const title = document.getElementById('classModalTitle');
+                const form = document.getElementById('classForm');
+
+                // Load teachers if not loaded
+                if (document.getElementById('classTeacher').options.length <= 1) {
+                    loadTeachersDropdown();
+                }
+
+                if (classId) {
+                    // Edit Mode
+                    const cls = allClasses.find(c => c.class_id === classId);
+                    if (!cls) return;
+
+                    title.textContent = 'تعديل الصف الدراسي';
+                    document.getElementById('classId').value = cls.class_id;
+                    document.getElementById('className').value = cls.class_name;
+                    document.getElementById('gradeLevel').value = cls.grade_level;
+                    document.getElementById('academicYear').value = cls.academic_year;
+                    document.getElementById('maxStudents').value = cls.max_students;
+                    document.getElementById('classTeacher').value = cls.class_teacher_id || '';
+                } else {
+                    // Add Mode
+                    title.textContent = 'إضافة صف جديد';
+                    form.reset();
+                    document.getElementById('classId').value = '';
+                    document.getElementById('academicYear').value = '2024-2025';
+                }
+
+                modal.classList.add('active');
+            }
+
+            document.getElementById('classForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const auth = checkAuth();
+                const id = document.getElementById('classId').value;
+                const isEdit = !!id;
+
+                const payload = {
+                    class_name: document.getElementById('className').value,
+                    grade_level: document.getElementById('gradeLevel').value,
+                    academic_year: document.getElementById('academicYear').value,
+                    max_students: document.getElementById('maxStudents').value,
+                    class_teacher_id: document.getElementById('classTeacher').value || null
+                };
+
+                const url = isEdit ? `${API_URL}/classes/${id}` : `${API_URL}/classes`;
+                const method = isEdit ? 'PUT' : 'POST';
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Authorization': `Bearer ${auth.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast(isEdit ? 'تم تحديث الصف بنجاح' : 'تم إضافة الصف بنجاح', 'success');
+                        document.getElementById('classModal').classList.remove('active');
+                        loadClasses();
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast('حدث خطأ', 'error');
+                }
+            });
+
+            document.getElementById('closeClassModal').addEventListener('click', () => {
+                document.getElementById('classModal').classList.remove('active');
+            });
+
+            // Cancel button event listener
+            document.getElementById('cancelClassBtn').addEventListener('click', () => {
+                document.getElementById('classModal').classList.remove('active');
+            });
+
+            // Hook up Add Button using delegated event listener or direct selection if button has ID/class
+            // Since button doesn't have ID, we use querySelector carefully or add ID in HTML later.
+            // For now, let's assume we will add an ID to the button in the HTML update step, 
+            // OR better, use a robust selector.
+            document.addEventListener('click', function (e) {
+                if (e.target.innerText && e.target.innerText.includes('إضافة صف') && e.target.classList.contains('btn')) {
+                    openClassModal();
+                }
+            });
+
+            // Make global
+            window.openClassModal = openClassModal;
+
+            // =================== SUBJECTS SECTION ===================
+
+            async function loadSubjects() {
+                const auth = checkAuth();
+                if (!auth) return;
+
+                try {
+                    const response = await fetch(`${API_URL}/subjects`, {
+                        headers: { 'Authorization': `Bearer ${auth.token}` }
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        allSubjects = data.data;
+                        displaySubjects(allSubjects);
+                    }
+                } catch (error) {
+                    console.error('خطأ:', error);
+                }
+            }
+
+            function displaySubjects(subjects) {
+                const tbody = document.getElementById('subjectsTableBody');
+                const auth = checkAuth();
+                const isStudent = auth && auth.user.role === 'student';
+
+                if (subjects.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">لا توجد مواد</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = subjects.map(subject => `
+                <tr>
+                    <td>${subject.subject_name}</td>
+                    <td>${subject.subject_code}</td>
+                    <td>${subject.credit_hours}</td>
+                    <td>
+                        ${!isStudent ? `<button class="btn btn-sm btn-secondary" onclick="openSubjectModal(${subject.subject_id})">تعديل</button>` : '<span class="text-muted" style="color: gray;">عرض فقط</span>'}
+                    </td>
+                </tr>
+            `).join('');
+            }
+
+            function openSubjectModal(subjectId = null) {
+                const modal = document.getElementById('subjectModal');
+                const title = document.getElementById('subjectModalTitle');
+                const form = document.getElementById('subjectForm');
+
+                if (subjectId) {
+                    const subject = allSubjects.find(s => s.subject_id === subjectId);
+                    if (!subject) return;
+
+                    title.textContent = 'تعديل المادة الدراسية';
+                    document.getElementById('subjectId').value = subject.subject_id;
+                    document.getElementById('subjectName').value = subject.subject_name;
+                    document.getElementById('subjectCode').value = subject.subject_code;
+                    document.getElementById('creditHours').value = subject.credit_hours;
+                    document.getElementById('subjectDescription').value = subject.description || '';
+                } else {
+                    title.textContent = 'إضافة مادة جديدة';
+                    form.reset();
+                    document.getElementById('subjectId').value = '';
+                }
+
+                modal.classList.add('active');
+            }
+
+            document.getElementById('subjectForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const auth = checkAuth();
+                const id = document.getElementById('subjectId').value;
+                const isEdit = !!id;
+
+                const payload = {
+                    subject_name: document.getElementById('subjectName').value,
+                    subject_code: document.getElementById('subjectCode').value,
+                    credit_hours: document.getElementById('creditHours').value,
+                    description: document.getElementById('subjectDescription').value
+                };
+
+                const url = isEdit ? `${API_URL}/subjects/${id}` : `${API_URL}/subjects`;
+                const method = isEdit ? 'PUT' : 'POST';
+
+                try {
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Authorization': `Bearer ${auth.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast(isEdit ? 'تم تحديث المادة بنجاح' : 'تم إضافة المادة بنجاح', 'success');
+                        document.getElementById('subjectModal').classList.remove('active');
+                        loadSubjects();
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast('حدث خطأ', 'error');
+                }
+            });
+
+            document.getElementById('closeSubjectModal').addEventListener('click', () => {
+                document.getElementById('subjectModal').classList.remove('active');
+            });
+
+            document.getElementById('cancelSubjectBtn').addEventListener('click', () => {
+                document.getElementById('subjectModal').classList.remove('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (e.target.innerText && e.target.innerText.includes('إضافة مادة') && e.target.classList.contains('btn')) {
+                    openSubjectModal();
+                }
+            });
+
+            window.openSubjectModal = openSubjectModal;
+
+            document.addEventListener('DOMContentLoaded', () => {
+                loadClasses();
+                loadSubjects();
+
+                const auth = checkAuth();
+                if (auth && auth.user.role === 'student') {
+                    // Hide Add Buttons
+                    const addBtns = document.querySelectorAll('button');
+                    addBtns.forEach(btn => {
+                        if (btn.textContent.includes('إضافة صف') || btn.textContent.includes('إضافة مادة')) {
+                            btn.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        </script>
+</body>
+
+</html>

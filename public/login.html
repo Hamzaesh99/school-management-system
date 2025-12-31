@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام إدارة المدرسة</title>
+    <!-- Unified Design System -->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-container">
+                <div class="logo"><img src="/assist/logo.jpg" alt="Logo"></div>
+                <h2 class="login-title">نظام إدارة المدرسة</h2>
+                <p class="login-subtitle">مرحباً بك! قم بتسجيل الدخول للمتابعة</p>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="username" class="form-control"
+                        placeholder="اسم المستخدم أو البريد الإلكتروني" required>
+                </div>
+
+                <div class="input-group password-group">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="password" class="form-control" placeholder="كلمة المرور" required>
+                    <button type="button" id="togglePassword" class="toggle-password-btn"
+                        title="إظهار/إخفاء كلمة المرور">
+                        <span class="toggle-icon">👁️</span>
+                    </button>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember">
+                        <span>تذكرني</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-3 font-bold mt-4">تسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+
+</html>

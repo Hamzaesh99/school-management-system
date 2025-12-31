@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين - نظام إدارة المدرسة</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .users-container {
+            padding: 3rem 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            font-weight: 800;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-title::before {
+            content: '👥';
+            font-size: 2rem;
+        }
+
+        .add-btn {
+            padding: 0.75rem 2rem;
+            background: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-btn:hover {
+            background: var(--orange-600);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(16, 185, 129, 0.4);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.8rem 1.8rem;
+            background: var(--white);
+            color: var(--primary-navy);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+            width: fit-content;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-navy);
+            color: var(--white);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.2);
+            border-color: var(--primary-navy);
+        }
+
+        .back-btn span:first-child {
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover span:first-child {
+            transform: translateX(4px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 2rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-green);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-green), var(--primary-navy));
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--orange-50), var(--blue-50));
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .users-table-container {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow-x: auto;
+            border: 1px solid var(--gray-100);
+        }
+
+        /* تحسين شريط التمرير */
+        .users-table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .users-table-container::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: var(--radius);
+        }
+
+        .users-table-container::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: var(--radius);
+        }
+
+        .users-table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--success-dark);
+        }
+
+        .table-header {
+            padding: 1.5rem 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: var(--gray-50);
+            color: var(--gray-600);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            text-align: right;
+            border-bottom: 1px solid var(--gray-200);
+            white-space: nowrap;
+        }
+
+        .users-table th:last-child,
+        .users-table td:last-child {
+            min-width: 150px;
+            width: 150px;
+        }
+
+        .users-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
+            vertical-align: middle;
+        }
+
+        .users-table tr:hover {
+            background-color: var(--gray-50);
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            gap: 0.35rem;
+        }
+
+        .role-admin {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .role-teacher {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .role-student {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .role-parent {
+            background: #F3E8FF;
+            color: #6B21A8;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #DEF7EC;
+            color: #03543F;
+        }
+
+        .status-inactive {
+            background: #FDE8E8;
+            color: #9B1C1C;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--white);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .btn-edit {
+            background: var(--info);
+        }
+
+        .btn-edit:hover {
+            background: var(--info-dark);
+            transform: scale(1.15);
+        }
+
+        .btn-password {
+            background: var(--warning);
+        }
+
+        .btn-password:hover {
+            background: var(--warning-dark);
+            transform: scale(1.15);
+        }
+
+        .btn-delete {
+            background: var(--error);
+        }
+
+        .btn-delete:hover {
+            background: var(--error-dark);
+            transform: scale(1.15);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 0;
+            max-width: 650px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-top: 6px solid var(--primary-green);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--gray-50);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--error-light);
+            color: var(--error);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        #userForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+            /* Handled by grid gap */
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            background: var(--white);
+            box-shadow: 0 0 0 4px var(--orange-100);
+        }
+
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .btn-save,
+        .btn-cancel {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-save {
+            background: var(--primary-green);
+            color: var(--white);
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-save:hover {
+            background: var(--success-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-cancel {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .btn-cancel:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        /* Responsive spacing for mobile */
+        @media (max-width: 768px) {
+            #userForm {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="users-container">
+        <a href="/dashboard" class="back-btn">
+            <span>←</span>
+            <span>العودة للوحة التحكم</span>
+        </a>
+
+        <div class="page-header">
+            <h1 class="page-title">إدارة المستخدمين</h1>
+            <button class="add-btn" onclick="showAddModal()">
+                <span>➕</span> إضافة مستخدم جديد
+            </button>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <!-- سيتم ملؤها بالبيانات -->
+        </div>
+
+        <div class="users-table-container">
+            <div class="table-header">قائمة المستخدمين</div>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>الرقم</th>
+                        <th>اسم المستخدم</th>
+                        <th>الاسم الكامل</th>
+                        <th>الدور</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الهاتف</th>
+                        <th>تاريخ الميلاد</th>
+                        <th>الجنس</th>
+                        <th>العنوان</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- سيتم ملؤها بالبيانات -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal لإضافة/تعديل مستخدم -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">إضافة مستخدم جديد</h2>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+
+                    <div class="form-group">
+                        <label class="form-label">اسم المستخدم*</label>
+                        <input type="text" class="form-input" id="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">الاسم الكامل*</label>
+                        <input type="text" class="form-input" id="fullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="emailLabel">البريد الإلكتروني*</label>
+                        <input type="email" class="form-input" id="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">رقم الهاتف</label>
+                        <input type="tel" class="form-input" id="phone" placeholder="05xxxxxxxx">
+                    </div>
+
+                    <div class="form-group full-width" id="passwordGroup">
+                        <label class="form-label">كلمة المرور*</label>
+                        <input type="text" class="form-input" id="password" required placeholder="6 أحرف على الأقل">
+                        <small
+                            style="color: var(--gray-500); font-size: 0.85rem; display: block; margin-top: 0.25rem;">سيتم
+                            تشفيرها تلقائياً بعد الحفظ</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">الدور*</label>
+                        <select class="form-select" id="role" required>
+                            <option value="">اختر الدور</option>
+                            <option value="admin">مدير</option>
+                            <option value="teacher">معلم</option>
+                            <option value="student">طالب</option>
+                            <option value="parent">ولي أمر</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group student-only" style="display: none;">
+                        <label class="form-label">الصف الدراسي / المرحلة</label>
+                        <select id="studentClass" class="form-select">
+                            <option value="">اختر الصف...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group student-only" style="display: none;">
+                        <label class="form-label">ولي الأمر</label>
+                        <select id="studentParent" class="form-select">
+                            <option value="">اختر ولي الأمر...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">الجنس</label>
+                        <select class="form-select" id="gender">
+                            <option value="">اختر الجنس</option>
+                            <option value="male">ذكر</option>
+                            <option value="female">أنثى</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" id="dobLabel">تاريخ الميلاد</label>
+                        <input type="date" class="form-input" id="dateOfBirth">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">العنوان</label>
+                        <input type="text" class="form-input" id="address" placeholder="المدينة، الحي">
+                    </div>
+
+                    <div class="form-group" id="statusGroup" style="display: none;">
+                        <label class="form-label">الحالة</label>
+                        <select class="form-select" id="isActive">
+                            <option value="1">نشط</option>
+                            <option value="0">غير نشط</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">
+                            <span>❌</span> إلغاء
+                        </button>
+                        <button type="submit" class="btn-save">
+                            <span>✅</span> حفظ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal لتغيير كلمة المرور -->
+    <div class="modal" id="passwordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">تغيير كلمة المرور</h2>
+                <button class="close-btn" onclick="closePasswordModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="passwordForm">
+                    <input type="hidden" id="passwordUserId">
+
+                    <div class="form-group full-width">
+                        <label class="form-label">كلمة المرور الجديدة*</label>
+                        <input type="password" class="form-input" id="newPassword" required minlength="6"
+                            placeholder="6 أحرف على الأقل">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">تأكيد كلمة المرور*</label>
+                        <input type="password" class="form-input" id="confirmPassword" required
+                            placeholder="أعد إدخال كلمة المرور">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closePasswordModal()">
+                            <span>❌</span> إلغاء
+                        </button>
+                        <button type="submit" class="btn-save">
+                            <span>🔒</span> تحديث كلمة المرور
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/users-management.js"></script>
+</body>
+
+</html>

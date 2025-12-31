@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المدرسة الإلكتروني</title>
+    <!-- Unified Design System -->
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+    <!-- Hero Section (Static) -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-logo"><img src="/assist/logo.jpg" alt="Logo"></div>
+            <h1 class="hero-title">نظام إدارة المدرسة الإلكتروني</h1>
+            <p class="hero-subtitle">
+                حل متكامل لإدارة جميع جوانب المدرسة بكفاءة واحترافية
+            </p>
+            <div class="hero-buttons">
+                <a href="/login" class="hero-btn primary" id="authBtn">تسجيل الدخول</a>
+                <a href="#features" class="hero-btn secondary">استكشاف المزايا</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hero Slider (Middle Section) -->
+    <section class="hero-slider" id="heroSlider">
+        <div class="slider-container">
+            <!-- Slide 1 -->
+            <div class="slide active" style="background-image: url('/assist/v1.jpg')">
+                <div class="slider-caption">
+                    <h2>مدرسة التواصل والعلوم</h2>
+                    <p>ريادة في التعليم وبناء المستقبل المشرق</p>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide" style="background-image: url('/assist/v2.jpg')">
+                <div class="slider-caption">
+                    <h2>بيئة تعليمية متطورة</h2>
+                    <p>نستخدم أحدث التقنيات لضمان أفضل تجربة تعليمية</p>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide" style="background-image: url('/assist/v3.jpg')">
+                <div class="slider-caption">
+                    <h2>كادر تعليمي متميز</h2>
+                    <p>نخبة من المعلمين والمعلمات ذوي الخبرة والكفاءة العالية</p>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide" style="background-image: url('/assist/v4.jpg')">
+                <div class="slider-caption">
+                    <h2>تواصل فعال ومستمر</h2>
+                    <p>جسر تواصل دائم بين المدرسة والمنزل لمتابعة مستمرة</p>
+                </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide" style="background-image: url('/assist/v5.jpg')">
+                <div class="slider-caption">
+                    <h2>أنشطة منهجية ولا منهجية</h2>
+                    <p>تنمية مهارات الطلاب وصقل مواهبهم في مختلف المجالات</p>
+                </div>
+            </div>
+
+            <!-- Slide 6 -->
+            <div class="slide" style="background-image: url('/assist/v6.jpg')">
+                <div class="slider-caption">
+                    <h2>مختبرات علمية حديثة</h2>
+                    <p>تطبيق عملي للنظريات العلمية في بيئة آمنة ومجهزة</p>
+                </div>
+            </div>
+
+            <!-- Slide 7 -->
+            <div class="slide" style="background-image: url('/assist/v7.jpg')">
+                <div class="slider-caption">
+                    <h2>مكتبة شاملة ومتنوعة</h2>
+                    <p>مصادر معرفة متنوعة لتشجيع البحث والقراءة والاطلاع</p>
+                </div>
+            </div>
+
+            <!-- Slide 8 -->
+            <div class="slide" style="background-image: url('/assist/v8.jpg')">
+                <div class="slider-caption">
+                    <h2>شراكة حقيقية</h2>
+                    <p>نعمل معاً لبناء جيل واعد ومبدع</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <button class="prev-btn" onclick="changeSlide(-1)">&#10094;</button>
+        <button class="next-btn" onclick="changeSlide(1)">&#10095;</button>
+
+        <!-- Dots -->
+        <div class="slider-dots" id="sliderDots"></div>
+    </section>
+
+    <script>
+        // Hero Slider Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dotsContainer = document.getElementById('sliderDots');
+        let slideInterval;
+
+        // Initialize Dots
+        slides.forEach((_, index) => {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(index);
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(n) {
+            // Wrap index
+            if (n >= slides.length) currentSlide = 0;
+            else if (n < 0) currentSlide = slides.length - 1;
+            else currentSlide = n;
+
+            // Remove active class
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Add active class
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        function changeSlide(n) {
+            showSlide(currentSlide + n);
+            resetTimer();
+        }
+
+        function goToSlide(n) {
+            showSlide(n);
+            resetTimer();
+        }
+
+        function resetTimer() {
+            clearInterval(slideInterval);
+            slideInterval = setInterval(() => changeSlide(1), 5000); // Change every 5 seconds
+        }
+
+        // Start Auto Play
+        resetTimer();
+    </script>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <h2 class="section-title">المميزات الرئيسية</h2>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">👨‍🎓</div>
+                <h3 class="feature-title">إدارة الطلاب</h3>
+                <p class="feature-description">
+                    نظام شامل لإدارة بيانات الطلاب والتسجيل والحضور والدرجات
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">👨‍🏫</div>
+                <h3 class="feature-title">إدارة المعلمين</h3>
+                <p class="feature-description">
+                    متابعة المعلمين وتوزيع المواد والصفوف الدراسية
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">📅</div>
+                <h3 class="feature-title">الجداول الدراسية</h3>
+                <p class="feature-description">
+                    إنشاء وإدارة الجداول الدراسية بسهولة ومرونة
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">✅</div>
+                <h3 class="feature-title">الحضور والغياب</h3>
+                <p class="feature-description">
+                    تسجيل الحضور اليومي ومتابعة نسب الحضور للطلاب
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">📝</div>
+                <h3 class="feature-title">إدارة الدرجات</h3>
+                <p class="feature-description">
+                    تسجيل ومتابعة درجات الطلاب في جميع المواد
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">التقارير والإحصائيات</h3>
+                <p class="feature-description">
+                    لوحة تحكم تفاعلية مع إحصائيات وتقارير شاملة
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">👥</div>
+                <h3 class="feature-title">متابعة أولياء الأمور</h3>
+                <p class="feature-description">
+                    تمكين أولياء الأمور من متابعة أداء أبنائهم
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">📢</div>
+                <h3 class="feature-title">الإعلانات والرسائل</h3>
+                <p class="feature-description">
+                    نظام إعلانات ورسائل للتواصل الفعال
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">الأمان والخصوصية</h3>
+                <p class="feature-description">
+                    نظام مصادقة آمن وحماية كاملة للبيانات
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-grid">
+            <div class="footer-col footer-logo">
+                <div class="logo-small" style="width: 80px; height: 80px; margin: 0;"><img src="/assist/logo.jpg"
+                        alt="Logo"></div>
+                <h3>مدرسة التواصل والعلوم</h3>
+                <p class="footer-desc">نظام تعليمي متكامل يهدف إلى تسهيل العملية التعليمية وربط المدرسة بالمنزل بأحدث
+                    التقنيات.</p>
+            </div>
+
+            <div class="footer-col footer-links">
+                <h4>روابط سريعة</h4>
+                <ul>
+                    <li><a href="#features">المميزات</a></li>
+                    <li><a href="/login">تسجيل الدخول</a></li>
+                    <li><a href="/about">من نحن</a></li>
+                    <li><a href="/privacy">سياسة الخصوصية</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col footer-contact">
+                <h4>تواصل معنا</h4>
+                <p id="footer-address">📍 طرابلس، ليبيا</p>
+                <p id="footer-phone">📞 +218 91 123 4567</p>
+                <p id="footer-email">✉️ info@altawasol.edu.ly</p>
+                <p id="footer-facebook" style="display: none;"><a href="#" target="_blank" rel="noopener noreferrer"
+                        class="social-link">👍 تابعنا على فيسبوك</a></p>
+                <p id="footer-twitter" style="display: none;"><a href="#" target="_blank" rel="noopener noreferrer"
+                        class="social-link">𝕏 تابعنا على تويتر</a></p>
+                <p id="footer-instagram" style="display: none;"><a href="#" target="_blank" rel="noopener noreferrer"
+                        class="social-link">📷 تابعنا على انستغرام</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © 2025 مدرسة التواصل والعلوم</p>
+        </div>
+    </footer>
+
+    <script src="/js/load-settings.js"></script>
+    <script>
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        reveal();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            const authBtn = document.getElementById('authBtn');
+
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    // User is logged in
+                    authBtn.textContent = `مرحباً، ${user.full_name.split(' ')[0]} - لوحة التحكم`;
+                    authBtn.href = '/dashboard';
+
+                    // Create and append logout button
+                    const logoutBtn = document.createElement('a');
+                    logoutBtn.href = '#';
+                    logoutBtn.className = 'hero-btn logout';
+                    logoutBtn.textContent = 'تسجيل الخروج';
+                    logoutBtn.onclick = async (e) => {
+                        e.preventDefault();
+                        const confirmed = await showLogoutConfirm();
+                        if (confirmed) {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            showToast('تم تسجيل الخروج بنجاح', 'success');
+                            setTimeout(() => {
+                                window.location.href = '/login';
+                            }, 800);
+                        }
+                    };
+
+                    // Insert logout button after dashbaord button
+                    if (authBtn.parentNode) {
+                        authBtn.parentNode.insertBefore(logoutBtn, authBtn.nextSibling);
+                    }
+
+                    // Add a welcome message or visual indicator
+                    const subtitle = document.querySelector('.hero-subtitle');
+                    if (subtitle) {
+                        subtitle.innerHTML += `<br><br><span style="color: var(--primary-green); font-weight: bold;">أنت متصل الآن كـ ${user.role === 'admin' ? 'مدير للنظام' : user.role === 'teacher' ? 'معلم' : user.role === 'student' ? 'طالب' : 'ولي أمر'}</span>`;
+                    }
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                }
+            }
+        });
+
+        // Toast Notification Function
+        function showToast(message, type = 'success') {
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'info') icon = 'ℹ️';
+
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span class="toast-message">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toastSlideOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                toast.addEventListener('animationend', () => {
+                    toast.remove();
+                });
+            }, 4000);
+        }
+
+        // Logout Confirmation Dialog
+        function showLogoutConfirm() {
+            return new Promise((resolve) => {
+                if (document.querySelector('.logout-confirm-overlay')) return;
+
+                const overlay = document.createElement('div');
+                overlay.className = 'logout-confirm-overlay';
+
+                overlay.innerHTML = `
+                    <div class="logout-confirm-box">
+                        <div class="logout-icon-container">
+                            <div class="logout-icon">🚪</div>
+                        </div>
+                        <h3 class="logout-title">تأكيد تسجيل الخروج</h3>
+                        <p class="logout-message">هل أنت متأكد من رغبتك في تسجيل الخروج من النظام؟</p>
+                        <div class="logout-actions">
+                            <button class="logout-btn logout-btn-cancel" id="logoutCancel">
+                                <span>إلغاء</span>
+                            </button>
+                            <button class="logout-btn logout-btn-confirm" id="logoutConfirm">
+                                <span>تسجيل الخروج</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+                setTimeout(() => overlay.classList.add('active'), 10);
+
+                const close = (result) => {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.remove(), 300);
+                    resolve(result);
+                };
+
+                document.getElementById('logoutConfirm').addEventListener('click', () => close(true));
+                document.getElementById('logoutCancel').addEventListener('click', () => close(false));
+
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) close(false);
+                });
+
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        close(false);
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+            });
+        }
+    </script>
+</body>
+
+</html>
